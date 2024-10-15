@@ -1,0 +1,31 @@
+name: facebookresearch/pytorch3d/build_and_test
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  binary_linux_conda_cuda:
+    runs-on: 4-core-ubuntu-gpu-t4
+    container:
+      image: pytorch/conda-cuda
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    env:
+      PYTHON_VERSION: "3.12"
+      BUILD_VERSION: "${{ github.run_number }}"
+      PYTORCH_VERSION: "2.4.1"
+      CU_VERSION: "cu121"
+      TESTRUN_DOCKER_IMAGE: "pytorch/conda-cuda"
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      JUST_TESTRUN: 1
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build and run tests
+      run: |-
+        # set -e
+        # export JUST_TESTRUN=1
+        # VARS_TO_PASS="-e PYTHON_VERSION -e BUILD_VERSION -e PYTORCH_VERSION -e CU_VERSION -e JUST_TESTRUN"
+        # docker run --gpus all  --ipc=host -v $(pwd):/remote -w /remote ${VARS_TO_PASS} ${TESTRUN_DOCKER_IMAGE} python3 ./packaging/build_conda.py
+        python3 ./packaging/build_conda.py
